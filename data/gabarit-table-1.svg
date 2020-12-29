@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="720mm"
+   height="300mm"
+   viewBox="0 0 720 300"
+   version="1.1"
+   id="svg8"
+   inkscape:version="1.0.1 (1.0.1+r74)"
+   sodipodi:docname="gabarit-table-1.svg">
+  <defs
+     id="defs2">
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect957"
+       is_visible="true"
+       lpeversion="1"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.3393619"
+     inkscape:cx="686.73364"
+     inkscape:cy="660.85319"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     inkscape:window-width="1715"
+     inkscape:window-height="941"
+     inkscape:window-x="1509"
+     inkscape:window-y="66"
+     inkscape:window-maximized="0"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(233.89153,-40.075024)">
+    <path
+       id="path955"
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m -213.51702,73.659481 c 36.74856,-3.789403 73.50507,0.09362 109.97699,3.967879 42.971777,-4.816426 84.678469,-18.448847 128.142753,-20.276365 57.86286,-5.6161 115.973507,-1.237512 173.433827,6.295288 59.88028,6.40869 119.78981,13.028235 178.89275,24.777953 29.84703,3.341202 59.47461,8.434408 88.17917,17.483784 0,63.92297 0,127.84594 0,191.76891 -53.89369,5.36749 -107.77405,12.18379 -160.29022,25.67578 C 223.04181,332.75849 143.3301,306.43404 66.357077,282.4121 -8.5311931,260.512 -86.393099,251.59486 -163.61703,242.26045 c -14.32737,-5.67685 -49.49448,6.08246 -49.3745,-13.83221 -0.35032,-51.58735 0.70065,-103.18306 -0.52549,-154.768759 z" />
+  </g>
+</svg>
