@@ -1,5 +1,4 @@
 import pytest
-import getopt
 import numpy as np
 import bezier2arc as b2a
 
@@ -17,14 +16,15 @@ def test_convert_file():
     assert True
 
 def test_convert_1():
-    args = ['-i', '../data/table-1-spline.svg', '-o', '../data/test_1.svg']
+    parser = b2a.get_parser()
+    args = parser.parse_args(['-i', '../data/table-1-spline.svg', '-o', '../data/test_1.svg'])
     b2a.convert_file(args)
     assert True
 
 def test_convert_2():
     args = ['--convert', '-i', '../data/table-1-spline.svg', '-o', '../data/test_1.svg']
-    b2a.main(args)
+    b2a.__main__.main(args)
 
 def test_getopt():
-    print(getopt.getopt(["--list", '-i', '-o'], 'l', ['list'] ))
+    print(getopt.getopt(["--list", '-i', '-o', 'www'], 'lio', ['list'] ))
     assert True

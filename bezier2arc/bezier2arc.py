@@ -1,10 +1,24 @@
 # Read svg file and convert splines to arcs
 
 # Read SVG into a list of path objects and list of dictionaries of attributes
-import sys, getopt
+import sys
+import argparse
 import numpy as np
 import svgpathtools as spt
 import logging
+
+def get_parser():
+    parser = argparse.ArgumentParser(description="Bezier curve to Arc converter")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--convert", action="store_true", default=False, dest="convert")
+    group.add_argument("--list", action="store_true", default=False, dest="list")
+    group.add_argument("--color", action="store_true", default=False, dest="color")
+
+    parser.add_argument("-i", "--infile", action="store", dest="infile", help="input file")
+    parser.add_argument("-o", "--outfile", action="store", dest="outfile", help="output file")
+    parser.add_argument("-n", "--nb_arcs", action="store", dest="nb_arcs", help="number of arcs per segment")
+
+    return parser
 
 def circle_from_points(p1, p2, p3):
     """"
@@ -67,21 +81,12 @@ def convert_bezier_to_arcs(input_file, nb_arcs):
 
     return new_paths, svg_attributes
 
-def list_paths(argv):
+def list_paths(args):
 
     input_file = ""
     nb_arcs = 1
-    try:
-        opts, args = getopt.getopt(argv, "hi:", ["ifile="])
-    except getopt.GetoptError:
-        print('bezier2arc.py --list -i <inputfile>')
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt == '-h':
-            print('bezier2arc.py --list  -i <inputfile> ')
-            sys.exit()
-        elif opt in ("-i", "--ifile"):
-            input_file = arg
+
+    input_file = args.infile
 
     if input_file == "":
         logging.error("Input file name is missing")
@@ -100,25 +105,18 @@ def list_paths(argv):
     logging.info("End")
 
 
-def convert_file(argv):
+def colorize(args):
+    pass
+
+
+def convert_file(args):
     input_file = ""
     output_file = ""
     nb_arcs = 1
-    try:
-        opts, args = getopt.getopt(argv, "hi:o:n:", ["ifile=", "ofile=", "nb_arcs"])
-    except getopt.GetoptError:
-        print('bezier2arc.py --convert -i <inputfile> -o <outputfile> -n <number of arcs per curve>')
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt == '-h':
-            print('bezier2arc.py -i <inputfile> -o <outputfile> -n <number of arcs per curve>')
-            sys.exit()
-        elif opt in ("-i", "--ifile"):
-            input_file = arg
-        elif opt in ("-o", "--ofile"):
-            output_file = arg
-        elif opt in ("-n", "--nb_arcs"):
-            nb_arcs = int(arg)
+
+    input_file = args.infile
+    output_file = args.outfile
+    nb_arcs = args.nb_arcs
 
     if input_file == "" or output_file == "":
         logging.error("Input or output file names are missing")

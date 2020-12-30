@@ -1,22 +1,25 @@
 import sys
 import logging
-import getopt
-from .bezier2arc import convert_file, list_paths
+from .bezier2arc import convert_file, list_paths, colorize, parser
 
 
 logging.basicConfig(
     filename="test.log"
     )
 
-def main(argv):
-    opts, args = getopt.getopt(argv, "", ["list", "convert"])
-    for opt, arg in opts:
-        if opt == "--list":
-            list_paths(args)
-    if opt == "--convert":
+def main(args):
+    print(args)
+    if args.list:
+        list_paths(args)
+    elif args.convert:
         convert_file(args)
+    elif args.color:
+        colorize(args)
+    else:
+        raise ValueError("Wrong arguments")
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    args = parser.parse_args()
+    main(args)
 
