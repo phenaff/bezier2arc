@@ -1,10 +1,10 @@
 import sys
 import logging
-from .bezier2arc import convert_file, list_paths, colorize, parser
+from .bezier2arc import convert_file, list_paths, colorize, get_parser
 
 
 logging.basicConfig(
-    filename="test.log"
+    filename="/home/phn/dev/bezier2arc/data/test.log"
     )
 
 def main(args):
@@ -20,6 +20,7 @@ def main(args):
 
 
 if __name__ == "__main__":
+    parser = get_parser()
     args = parser.parse_args()
     main(args)
 
