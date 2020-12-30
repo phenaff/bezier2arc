@@ -28,13 +28,6 @@ def test_list_1():
     b2a.list_paths(args)
     assert True
 
-def test_colorize_1():
-    paths, attributes, svg_attributes = spt.svg2paths2('../data/gabarit-table-1-colors.svg')
-    print('\n')
-    print(paths)
-    print(attributes)
-    print(svg_attributes)
-
 def test_colorize():
     parser = b2a.get_parser()
     args = parser.parse_args(['-i', '../data/table-1-spline.svg', "-o", "../data/table-1-spline-colors.svg"])

@@ -5,15 +5,15 @@ base="/home/phn/Documents/WoodWorking/Projects/Live-edge-table"
 function convert_file() {
 
 infile=$base/$1/$2
-outfile=$base/$1/$3
+colorfile=$base/$1/$3
+arcfile=$base/$1/$4
 
 python -m bezier2arc --list -i $infile
-
-python -m bezier2arc --convert -i $infile -o $outfile
-
-python -m bezier2arc --list -i $outfile
+python -m bezier2arc --color -i $infile -o $colorfile
+python -m bezier2arc --convert -i $infile -o $arcfile
+python -m bezier2arc --list -i $arcfile
 
 }
 
-convert_file table-1 gabarit-table-1.svg gabarit-table-1-arc.svg
+convert_file table-1 gabarit-table-1.svg gabarit-table-1-color.svg gabarit-table-1-arc.svg
 

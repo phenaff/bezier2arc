@@ -124,14 +124,32 @@ def list_paths(args):
 
 
 def colorize(args):
-    pass
+    input_file = args.infile
+    output_file = args.outfile
+
+    if input_file == "" or output_file == "":
+        logging.error("Input or output file names are missing")
+        raise ValueError("Input and output files are needed")
+
+    logging.info("input file {} output file {}".format(input_file, output_file))
+
+    paths, attributes, svg_attributes = spt.svg2paths2(input_file)
+
+    # each segment must be a path in order to assign a color
+
+    new_paths = []
+    for path in paths:
+        for segment in path:
+            new_paths.append(spt.Path(segment))
+
+    nb_segments = len(new_paths)
+    col = ['r', 'g', 'b', 'k']
+    segment_col = ''.join([col[i % len(col)] for i in range(nb_segments)])
+
+    spt.wsvg(new_paths, colors=segment_col, stroke_widths=[2] * nb_segments, filename=output_file)
 
 
 def convert_file(args):
-    input_file = ""
-    output_file = ""
-    nb_arcs = 1
-
     input_file = args.infile
     output_file = args.outfile
     nb_arcs = args.nb_arcs

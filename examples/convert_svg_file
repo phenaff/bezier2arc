@@ -3,9 +3,8 @@
 python -m bezier2arc --help
 
 python -m bezier2arc --list -i ../data/table-1-spline.svg
-
+python -m bezier2arc --color -i ../data/table-1-spline.svg -o ../data/table-1-colors.svg
 python -m bezier2arc --convert -i ../data/table-1-spline.svg -o ../data/table-1-arcs.svg
-
 python -m bezier2arc --list -i ../data/table-1-arcs.svg
 
 
