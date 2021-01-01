@@ -16,9 +16,15 @@ def test_convert_file():
 
     assert True
 
-def test_convert_1():
+def test_convert_svg():
     parser = b2a.get_parser()
     args = parser.parse_args(['-i', '../data/table-1-spline.svg', '-o', '../data/test_1.svg'])
+    b2a.convert_file(args)
+    assert True
+
+def test_convert_dxf():
+    parser = b2a.get_parser()
+    args = parser.parse_args(['-i', '../data/table-1-spline.svg', '-o', '../data/test_1.dxf'])
     b2a.convert_file(args)
     assert True
 
