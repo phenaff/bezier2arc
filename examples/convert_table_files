@@ -3,15 +3,21 @@
 base="/home/phn/Documents/WoodWorking/Projects/Live-edge-table"
 input="profile-bezier.svg"
 colors="profile-bezier-colors.svg"
+arcs="profile-arcs.svg"
+
 function convert_file() {
 
 infile=$base/$1/$input
 colorfile=$base/$1/$colors
-arcfile=$base/$1/"gabarit-"$1".svg"
+arcfile=$base/$1/$arcs
 
+# list all paths and segments in original file
 python -m bezier2arc --list -i $infile
+# color the segments - useful for identifying errors in input file
 python -m bezier2arc --color -i $infile -o $colorfile
+# convert to arcs
 python -m bezier2arc --convert -i $infile -o $arcfile
+# ... verify result
 python -m bezier2arc --list -i $arcfile
 }
 
