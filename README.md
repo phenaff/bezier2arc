@@ -58,4 +58,7 @@ $ python -m bezier2arc --color -i ./data/table-1-spline.svg -o table-1-spline-co
 
 ![table-1-spline-colors.svg](table-1-spline-colors.svg)
 
+License
+-------
 
+This module is under a MIT License
