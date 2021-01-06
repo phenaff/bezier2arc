@@ -3,10 +3,12 @@ import numpy as np
 import bezier2arc as b2a
 import svgpathtools as spt
 
+
 def test_convert_file():
     input_file = "../data/gabarit-table-1.svg"
-    nb_arcs = 1
-    new_paths, svg_attributes = b2a.convert_bezier_to_arcs(input_file, nb_arcs)
+    min_radius = 50
+    max_dist = 3
+    new_paths, svg_attributes = b2a.convert_to_svg(input_file, max_dist, min_radius)
 
     for idx, path in enumerate(new_paths):
         print('=== new path {}'.format(idx))
@@ -16,23 +18,28 @@ def test_convert_file():
 
     assert True
 
+
 def test_convert_svg():
     parser = b2a.get_parser()
-    args = parser.parse_args(['-i', '../data/table-1-spline.svg', '-o', '../data/test_1.svg'])
+    args = parser.parse_args(['-i', '../data/table-1-spline.svg', '-o', '../data/test_1.svg', '-r', '50'])
+    print(args)
     b2a.convert_file(args)
     assert True
 
+
 def test_convert_dxf():
-    parser = b2a.get_parser()
-    args = parser.parse_args(['-i', '../data/table-1-spline.svg', '-o', '../data/test_1.dxf'])
-    b2a.convert_file(args)
-    assert True
+    with pytest.raises(ValueError):
+        parser = b2a.get_parser()
+        args = parser.parse_args(['-i', '../data/table-1-spline.svg', '-o', '../data/test_1.dxf', '-r', '50'])
+        b2a.convert_file(args)
+
 
 def test_list_1():
     parser = b2a.get_parser()
     args = parser.parse_args(['-i', '../data/gabarit-table-1.svg'])
     b2a.list_paths(args)
     assert True
+
 
 def test_colorize():
     parser = b2a.get_parser()

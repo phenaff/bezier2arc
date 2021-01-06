@@ -11,6 +11,8 @@ import warnings
 import ezdxf
 from ezdxf import units
 import cmath
+from scipy.optimize import fminbound
+
 
 def get_parser():
     parser = argparse.ArgumentParser(description="Bezier curve to Arc converter")
@@ -22,9 +24,11 @@ def get_parser():
     parser.add_argument("-i", "--infile", action="store", dest="infile", help="input file")
     parser.add_argument("-o", "--outfile", action="store", dest="outfile", help="output file")
     parser.add_argument("-l", "--logfile", action="store", dest="logfile", default="log.txt", help="log file")
-    parser.add_argument("-n", "--nb_arcs", action="store", dest="nb_arcs", help="number of arcs per segment")
+    parser.add_argument("-r", "--min_radius", action="store", dest="min_radius", type=float, help="minimum arc radius", default=50)
+    parser.add_argument("-d", "--max_dist", action="store", dest="max_dist", type=float, help="max distance from arc to spline", default=2)
 
     return parser
+
 
 def circle_from_points(p1, p2, p3):
     """"
@@ -42,8 +46,54 @@ def circle_from_points(p1, p2, p3):
 
     return center, radius
 
+
 def c2t(c):
-    return (c.real, c.imag)
+    return c.real, c.imag
+
+
+def max_distance(cb_segment, arc):
+
+    path1 = cb_segment
+    path2 = arc
+
+    def dist(t):
+        return -path1.radialrange(path2.point(t))[0][0]
+    t2 = fminbound(dist, 0, 1)
+
+    pt2 = path2.point(t2)
+    d = path1.radialrange(pt2)[0][0]
+
+    return d
+
+
+def fit_arc(cb, t_start, t_end, tol_dist, min_radius):
+    t_arc = (t_end - t_start) * 2
+    max_dist = np.inf
+    a = None
+    print(cb)
+    while max_dist > tol_dist:
+        t_arc = t_arc / 2
+        p1 = cb.point(t_start)
+        p3 = cb.point(t_start + t_arc)
+        p2 = cb.point(t_start + t_arc / 2)
+
+        center, radius = circle_from_points(p1, p2, p3)
+        print("t_start: {} t_arc: {} radius: {}".format(t_start, t_arc, radius))
+        if radius < min_radius:
+            t_arc *= 2
+            break
+        v_start = p1-center
+        v_end = p3-center
+        is_ccw = np.diff(np.angle([v_start, v_end]))[0] > 0
+        a = spt.Arc(p1, radius=complex(radius, radius), rotation=0, large_arc=False, sweep=is_ccw, end=p3)
+
+        max_dist = max_distance(cb, a)
+
+    if a is None:
+        raise ValueError("Arc radius less than min radius")
+
+    return a, t_arc
+
 
 def _bezier_to_dxf_arc(segment):
     p1 = segment.start
@@ -64,51 +114,32 @@ def _bezier_to_dxf_arc(segment):
         center, radius = circle_from_points(p1, p2, p3)
         # rotation parameter does not matter for a circle
         a = ezdxf.math.ConstructionArc(center=c2t(center), radius=radius, start_angle=cmath.phase(p1-center),
-                    end_angle=cmath.phase(p3-center), is_counter_clockwise=b_sweep)
+                                       end_angle=cmath.phase(p3-center), is_counter_clockwise=b_sweep)
 
-    return(a)
+    return a
 
 
-
-def _bezier_to_svg_arc(segment):
+def _bezier_to_svg_arc(segment, max_dist, min_radius):
     p1 = segment.start
     p2 = segment.point(0.5)
     p3 = segment.end
 
-    tol = 1.e-5
-    _ratio = (p1-p3)/(p3-p2)
-    if np.abs(np.imag(_ratio)) < tol:
-        a = spt.Line(start=p1, end=p3)
-    else:
-        # magic to determine sweep
-        v_mid = p2 - p1
-        v_end = p3 - p1
-        a_mid, a_end = np.angle([v_mid, v_end])
-        b_sweep = a_mid < a_end
-
-        center, radius = circle_from_points(p1, p2, p3)
-        # rotation parameter does not matter for a circle
-        a = spt.Arc(p1, radius=complex(radius, radius), rotation=0, large_arc=False, sweep=b_sweep, end=p3)
-    return a
-
-    # if they are collinear, cannot fit circle, fit straight line instead
+    p = []
     # if p1, p2, p3 are collinear, then
     # (p1-p3)/(p3-p2) is real
     tol = 1.e-5
     _ratio = (p1-p3)/(p3-p2)
     if np.abs(np.imag(_ratio)) < tol:
         a = spt.Line(start=p1, end=p3)
+        p.append(a)
     else:
-        # magic to determine sweep
-        v_mid = p2 - p1
-        v_end = p3 - p1
-        a_mid, a_end = np.angle([v_mid, v_end])
-        b_sweep = a_mid < a_end
-
-        center, radius = circle_from_points(p1, p2, p3)
-        # rotation parameter does not matter for a circle
-        a = spt.Arc(p1, radius=complex(radius, radius), rotation=0, large_arc=False, sweep=b_sweep, end=p3)
-    return a
+        t_start = 0
+        t_end = 1
+        while t_start < t_end:
+            a, t_arc = fit_arc(segment, t_start, t_end, max_dist, min_radius)
+            p.append(a)
+            t_start += t_arc
+    return p
 
 
 def convert_to_dxf(input_file):
@@ -147,7 +178,8 @@ def convert_to_dxf(input_file):
 
     return doc
 
-def convert_to_svg(input_file, nb_arcs):
+
+def convert_to_svg(input_file, max_dist, min_radius):
 
     # to handle numpy warnings as errors
     warnings.filterwarnings("error")
@@ -168,12 +200,12 @@ def convert_to_svg(input_file, nb_arcs):
             elif isinstance(segment, spt.CubicBezier):
                 # approximate cubic Bezier by NB_ARCS
                 try:
-                    a = _bezier_to_svg_arc(segment)
+                    a = _bezier_to_svg_arc(segment, max_dist, min_radius)
                 except Warning:
                     logging.info("error in path {} segment {}".format(idx, jdx))
                     logging.info(segment)
                     raise
-                new_path.append(a)
+                new_path  += a
                 logging.info("Found Bezier curve in Path {} segment {}".format(idx, jdx))
             else:
                 logging.error("segment type {} is not supported".format(type(segment)))
@@ -182,10 +214,8 @@ def convert_to_svg(input_file, nb_arcs):
 
     return new_paths, svg_attributes
 
-def list_paths(args):
 
-    input_file = ""
-    nb_arcs = 1
+def list_paths(args):
 
     input_file = args.infile
 
@@ -233,19 +263,21 @@ def colorize(args):
 
 
 def convert_file(args):
+    print(args)
     input_file = args.infile
     output_file = args.outfile
-    nb_arcs = args.nb_arcs
+    min_radius = args.min_radius
+    max_dist = args.max_dist
 
     if input_file == "" or output_file == "":
         logging.error("Input or output file names are missing")
         raise ValueError("Input and output files are needed")
 
-    logging.info("input file {} output file {} nb arcs {}".format(input_file, output_file, nb_arcs))
+    logging.info("input file {} output file {} min radius {}".format(input_file, output_file, min_radius))
 
     file_name, file_extension = os.path.splitext(output_file)
     if file_extension == '.svg':
-        new_paths, svg_attributes = convert_to_svg(input_file, nb_arcs)
+        new_paths, svg_attributes = convert_to_svg(input_file, max_dist, min_radius)
 
         for idx, path in enumerate(new_paths):
             logging.info('=== new path {}'.format(idx))
@@ -254,9 +286,7 @@ def convert_file(args):
                 logging.info(segment)
         spt.wsvg(new_paths, svg_attributes=svg_attributes, filename=output_file)
     elif file_extension == '.dxf':
-        doc = convert_to_dxf(input_file)
-        doc.saveas(output_file)
+        raise ValueError("convert to dxf not yet implemented.")
+        # doc = convert_to_dxf(input_file, max_dist, min_radius)
+        # doc.saveas(output_file)
     logging.info("End")
-
-
-
